@@ -29,7 +29,7 @@ public class BusinessController {
 
     // Create a new business
     @PostMapping
- //   @PreAuthorize("hasRole('business_owner')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<BusinessResponse> createBusiness( @RequestBody BusinessRequest request) {
         BusinessResponse response = businessService.createBusiness(request);
         return ResponseEntity.status(201).body(response);
@@ -37,7 +37,7 @@ public class BusinessController {
 
     // Get a business by ID
     @GetMapping("/{id}")
-  //  @PreAuthorize("hasRole('business_owner')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<BusinessResponse> getBusiness(@PathVariable UUID id) {
         BusinessResponse response = businessService.getBusiness(id);
         return ResponseEntity.ok(response);
@@ -45,6 +45,8 @@ public class BusinessController {
 
     // Get all businesses
     @GetMapping
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+
     public ResponseEntity<List<BusinessResponse>> getAllBusinesses() {
         List<BusinessResponse> responses = businessService.getAllBusinesses();
         return ResponseEntity.ok(responses);
@@ -52,7 +54,7 @@ public class BusinessController {
 
     // Update a business
     @PutMapping("/{id}")
-  //  @PreAuthorize("hasRole('business_owner')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<BusinessResponse> updateBusiness(@PathVariable UUID id, @RequestBody BusinessRequest request) {
         BusinessResponse response = businessService.updateBusiness(id, request);
         return ResponseEntity.ok(response);
@@ -60,7 +62,7 @@ public class BusinessController {
 
     // Delete a business
     @DeleteMapping("/{id}")
-   // @PreAuthorize("hasRole('business_owner')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<Void> deleteBusiness(@PathVariable UUID id) {
         businessService.deleteBusiness(id);
         return ResponseEntity.noContent().build();

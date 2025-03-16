@@ -5,6 +5,7 @@ import com.CheritSolutions.Business.dto.ServiceResponse;
 import com.CheritSolutions.Business.service.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class ServiceeController {
 
     // Create a new service for a business
     @PostMapping
-   // @PreAuthorize("hasRole('BUSINESS_OWNER')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<ServiceResponse> createServicee(
             @PathVariable UUID businessId,
             @RequestBody ServiceRequest request) {
@@ -30,7 +31,7 @@ public class ServiceeController {
 
     // Get a service by ID
     @GetMapping("/{serviceId}")
-   // @PreAuthorize("hasRole('BUSINESS_OWNER')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<ServiceResponse> getServicee(@PathVariable UUID serviceId) {
         ServiceResponse response = serviceeService.getService(serviceId);
         return ResponseEntity.ok(response);
@@ -45,7 +46,7 @@ public class ServiceeController {
 
     // Update a service
     @PutMapping("/{serviceId}")
-   // @PreAuthorize("hasRole('BUSINESS_OWNER')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<ServiceResponse> updateServicee(
             @PathVariable UUID serviceId,
             @RequestBody ServiceRequest request) {
@@ -55,7 +56,7 @@ public class ServiceeController {
 
     // Delete a service
     @DeleteMapping("/{serviceId}")
-    //@PreAuthorize("hasRole('BUSINESS_OWNER')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<Void> deleteServicee(@PathVariable UUID serviceId) {
         serviceeService.deleteService(serviceId);
         return ResponseEntity.noContent().build();

@@ -5,6 +5,7 @@ import com.CheritSolutions.Business.dto.StaffResponse;
 import com.CheritSolutions.Business.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,7 @@ public class StaffController {
 
     // Get a staff member by ID
     @GetMapping("/{staffId}")
-   // @PreAuthorize("hasRole('BUSINESS_OWNER')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<StaffResponse> getStaff(@PathVariable UUID staffId) {
         StaffResponse response = staffService.getStaff(staffId);
         return ResponseEntity.ok(response);
@@ -38,6 +39,8 @@ public class StaffController {
 
     // Get all staff members for a business
     @GetMapping
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+
     public ResponseEntity<List<StaffResponse>> getAllStaffByBusiness(@PathVariable UUID businessId) {
         List<StaffResponse> responses = staffService.getAllStaffByBusiness(businessId);
         return ResponseEntity.ok(responses);
@@ -45,7 +48,7 @@ public class StaffController {
 
     // Update a staff member
     @PutMapping("/{staffId}")
-   // @PreAuthorize("hasRole('BUSINESS_OWNER')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<StaffResponse> updateStaff(
             @PathVariable UUID staffId,
             @RequestBody StaffRequest request) {
@@ -55,7 +58,7 @@ public class StaffController {
 
     // Delete a staff member
     @DeleteMapping("/{staffId}")
-   // @PreAuthorize("hasRole('BUSINESS_OWNER')")
+    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
     public ResponseEntity<Void> deleteStaff(@PathVariable UUID staffId) {
         staffService.deleteStaff(staffId);
         return ResponseEntity.noContent().build();

@@ -11,6 +11,7 @@ public class BusinessResponse {
     private UUID id;
     private String name;
     private String address;
+   // private String ownerId;
     private List<ServiceResponse> services; // Nested DTO
     private List<StaffResponse> staff; // Simplified staff data
 }

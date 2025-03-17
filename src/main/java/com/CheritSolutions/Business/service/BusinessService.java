@@ -7,6 +7,7 @@ import com.CheritSolutions.Business.exception.ResourceNotFoundException;
 import com.CheritSolutions.Business.repository.BusinessRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +26,11 @@ public class BusinessService {
 
     // Create a new business
     @Transactional
-    public BusinessResponse createBusiness(BusinessRequest request) {
+    public BusinessResponse createBusiness(BusinessRequest request , Jwt jwt) {
         Business business = modelMapper.map(request, Business.class);
+         // Extract the ownerId from the JWT and set it in the entity
+         String ownerId = jwt.getSubject(); // Get the "sub" claim from the token
+         business.setOwnerId(ownerId);
         Business savedBusiness = businessRepository.save(business);
         return modelMapper.map(savedBusiness, BusinessResponse.class);
     }
@@ -64,5 +68,15 @@ public class BusinessService {
         Business business = businessRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Business not found"));
         businessRepository.delete(business);
+ 
+    }
+    public boolean isBusinessOwner(UUID businessId, String ownerId) {
+        return businessRepository.findById(businessId)
+            .map(business -> {
+                System.out.println("Database ownerId: " + business.getOwnerId());
+                System.out.println("JWT sub (ownerId): " + ownerId);
+                return business.getOwnerId().equals(ownerId);
+            })
+            .orElseThrow(() -> new ResourceNotFoundException("Business not found"));
     }
 }

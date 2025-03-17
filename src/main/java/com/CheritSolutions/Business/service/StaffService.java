@@ -72,4 +72,9 @@ public class StaffService {
                 .orElseThrow(() -> new ResourceNotFoundException("Staff not found"));
         staffRepository.delete(staff);
     }
+    public boolean isStaffOwner(UUID staffId, String userId) {
+        return staffRepository.findById(staffId)
+            .map(staff -> staff.getBusiness().getOwnerId().equals(userId))
+            .orElseThrow(() -> new ResourceNotFoundException("Staff member not found"));
+    }
 }

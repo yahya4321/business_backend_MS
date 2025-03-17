@@ -72,4 +72,9 @@ public class ServiceService {
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
         serviceRepository.delete(service);
     }
+    public boolean isServiceOwner(UUID serviceId, String userId) {
+        return serviceRepository.findById(serviceId)
+            .map(service -> service.getBusiness().getOwnerId().equals(userId))
+            .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
+    }
 }

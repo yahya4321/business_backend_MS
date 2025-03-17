@@ -2,6 +2,7 @@ package com.CheritSolutions.Business.controller;
 
 import com.CheritSolutions.Business.dto.ServiceRequest;
 import com.CheritSolutions.Business.dto.ServiceResponse;
+import com.CheritSolutions.Business.service.BusinessService;
 import com.CheritSolutions.Business.service.ServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +19,22 @@ public class ServiceeController {
 
     @Autowired
     private ServiceService serviceeService;
+ 
 
     // Create a new service for a business
-    @PostMapping
-    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+    @PostMapping                              
+    @PreAuthorize("hasRole('BUSINESS_OWNER') and @businessService.isBusinessOwner(#businessId, authentication.name)")
+
     public ResponseEntity<ServiceResponse> createServicee(
             @PathVariable UUID businessId,
             @RequestBody ServiceRequest request) {
         ServiceResponse response = serviceeService.createService(businessId, request);
         return ResponseEntity.status(201).body(response);
     }
-
+ 
     // Get a service by ID
     @GetMapping("/{serviceId}")
-    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+    @PreAuthorize("@serviceService.isServiceOwner(#serviceId, authentication.name)")
     public ResponseEntity<ServiceResponse> getServicee(@PathVariable UUID serviceId) {
         ServiceResponse response = serviceeService.getService(serviceId);
         return ResponseEntity.ok(response);
@@ -39,6 +42,7 @@ public class ServiceeController {
 
     // Get all services for a business
     @GetMapping
+
     public ResponseEntity<List<ServiceResponse>> getAllServicesByBusiness(@PathVariable UUID businessId) {
         List<ServiceResponse> responses = serviceeService.getAllServicesByBusiness(businessId);
         return ResponseEntity.ok(responses);
@@ -46,7 +50,7 @@ public class ServiceeController {
 
     // Update a service
     @PutMapping("/{serviceId}")
-    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+    @PreAuthorize("@serviceService.isServiceOwner(#serviceId, authentication.name)")
     public ResponseEntity<ServiceResponse> updateServicee(
             @PathVariable UUID serviceId,
             @RequestBody ServiceRequest request) {
@@ -56,7 +60,7 @@ public class ServiceeController {
 
     // Delete a service
     @DeleteMapping("/{serviceId}")
-    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+    @PreAuthorize("@serviceService.isServiceOwner(#serviceId, authentication.name)")
     public ResponseEntity<Void> deleteServicee(@PathVariable UUID serviceId) {
         serviceeService.deleteService(serviceId);
         return ResponseEntity.noContent().build();

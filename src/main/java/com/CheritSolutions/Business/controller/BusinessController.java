@@ -2,10 +2,12 @@ package com.CheritSolutions.Business.controller;
 
 import java.util.List;
 import java.util.UUID;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,22 +32,22 @@ public class BusinessController {
     // Create a new business
     @PostMapping
     @PreAuthorize("hasRole('BUSINESS_OWNER')") 
-    public ResponseEntity<BusinessResponse> createBusiness( @RequestBody BusinessRequest request) {
-        BusinessResponse response = businessService.createBusiness(request);
+    public ResponseEntity<BusinessResponse> createBusiness( @RequestBody BusinessRequest request ,@AuthenticationPrincipal Jwt jwt) {
+        BusinessResponse response = businessService.createBusiness(request, jwt);
         return ResponseEntity.status(201).body(response);
     }
 
     // Get a business by ID
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
-    public ResponseEntity<BusinessResponse> getBusiness(@PathVariable UUID id) {
+    @PreAuthorize("hasRole('BUSINESS_OWNER') and @businessService.isBusinessOwner(#id, authentication.name)")
+    public ResponseEntity<BusinessResponse> getBusiness(@PathVariable UUID id ) {
         BusinessResponse response = businessService.getBusiness(id);
         return ResponseEntity.ok(response);
     }
 
     // Get all businesses
     @GetMapping
-    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+    @PreAuthorize("hasRole('ADMIN')") 
 
     public ResponseEntity<List<BusinessResponse>> getAllBusinesses() {
         List<BusinessResponse> responses = businessService.getAllBusinesses();
@@ -54,7 +56,7 @@ public class BusinessController {
 
     // Update a business
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+    @PreAuthorize("hasRole('BUSINESS_OWNER') and @businessService.isBusinessOwner(#id, authentication.name)")
     public ResponseEntity<BusinessResponse> updateBusiness(@PathVariable UUID id, @RequestBody BusinessRequest request) {
         BusinessResponse response = businessService.updateBusiness(id, request);
         return ResponseEntity.ok(response);
@@ -62,7 +64,7 @@ public class BusinessController {
 
     // Delete a business
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+    //@PreAuthorize("hasRole('BUSINESS_OWNER') and @businessService.isBusinessOwner(#id, authentication.name)")
     public ResponseEntity<Void> deleteBusiness(@PathVariable UUID id) {
         businessService.deleteBusiness(id);
         return ResponseEntity.noContent().build();

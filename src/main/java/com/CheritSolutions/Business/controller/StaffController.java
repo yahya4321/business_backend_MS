@@ -31,7 +31,7 @@ public class StaffController {
 
     // Get a staff member by ID
     @GetMapping("/{staffId}")
-    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+    @PreAuthorize("@staffService.isStaffOwner(#staffId, authentication.name)")
     public ResponseEntity<StaffResponse> getStaff(@PathVariable UUID staffId) {
         StaffResponse response = staffService.getStaff(staffId);
         return ResponseEntity.ok(response);

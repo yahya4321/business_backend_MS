@@ -34,6 +34,9 @@ public class Business {
 
     @Column(nullable = false)
     private String address;
+    
+    @Column(name = "owner_id")
+    private String ownerId;
 
     @OneToMany(mappedBy = "business", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore // Avoid circular references in JSON responses

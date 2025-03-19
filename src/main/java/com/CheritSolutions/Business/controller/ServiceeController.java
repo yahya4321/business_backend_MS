@@ -65,4 +65,12 @@ public class ServiceeController {
         serviceeService.deleteService(serviceId);
         return ResponseEntity.noContent().build();
     }
+    @PostMapping("/{serviceId}/assign-staff/{staffId}")
+    public ResponseEntity<Void> assignStaffToService(
+            @PathVariable UUID serviceId,
+            @PathVariable UUID staffId) {
+        serviceeService.assignStaffToService(staffId, serviceId); // Fixed parameter order
+        return ResponseEntity.ok().build();
+    }
+
 }

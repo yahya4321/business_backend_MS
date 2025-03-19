@@ -1,19 +1,24 @@
 package com.CheritSolutions.Business.service;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.CheritSolutions.Business.dto.ServiceRequest;
 import com.CheritSolutions.Business.dto.ServiceResponse;
 import com.CheritSolutions.Business.entity.Business;
 import com.CheritSolutions.Business.entity.Servicee;
+import com.CheritSolutions.Business.entity.Staff;
 import com.CheritSolutions.Business.exception.ResourceNotFoundException;
 import com.CheritSolutions.Business.repository.BusinessRepository;
 import com.CheritSolutions.Business.repository.ServiceRepository;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import com.CheritSolutions.Business.repository.StaffRepository;
 
 @Service
 public class ServiceService {
@@ -23,6 +28,9 @@ public class ServiceService {
 
     @Autowired
     private BusinessRepository businessRepository;
+
+    @Autowired
+    private StaffRepository staffRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -37,6 +45,8 @@ public class ServiceService {
         Servicee savedService = serviceRepository.save(service);
         return modelMapper.map(savedService, ServiceResponse.class);
     }
+    
+
 
     // Get a service by ID
     @Transactional(readOnly = true)
@@ -77,4 +87,25 @@ public class ServiceService {
             .map(service -> service.getBusiness().getOwnerId().equals(userId))
             .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
     }
+
+
+    
+  // ServiceService.java
+public Staff assignStaffToService(UUID staffId, UUID serviceId) {
+    Staff staff = staffRepository.findById(staffId)
+            .orElseThrow(() -> new ResourceNotFoundException("Staff not found"));
+    Servicee service = serviceRepository.findById(serviceId)
+            .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
+
+    // Ensure service belongs to the same business as the staff
+    if (!staff.getBusiness().getId().equals(service.getBusiness().getId())) {
+        throw new IllegalArgumentException("Service does not belong to the staff's business");
+    }
+
+    // Unassign from previous service and assign to new
+    staff.setService(null);
+    staff.setService(service);
+    return staffRepository.save(staff);
+}
+    
 }

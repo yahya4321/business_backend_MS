@@ -11,4 +11,6 @@ import com.CheritSolutions.Business.entity.Staff;
 @Repository
 public interface StaffRepository extends JpaRepository<Staff, UUID> {
     List<Staff> findByBusinessId(UUID businessId);
+    List<Staff> findByServiceId(UUID serviceId);
+
 }

@@ -2,6 +2,7 @@ package com.CheritSolutions.Business.controller;
 
 import com.CheritSolutions.Business.dto.StaffRequest;
 import com.CheritSolutions.Business.dto.StaffResponse;
+import com.CheritSolutions.Business.service.ServiceService;
 import com.CheritSolutions.Business.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,8 @@ public class StaffController {
 
     @Autowired
     private StaffService staffService;
+     @Autowired
+    private ServiceService serviceService;
 
     // Add a staff member to a business
     @PostMapping
@@ -63,4 +66,14 @@ public class StaffController {
         staffService.deleteStaff(staffId);
         return ResponseEntity.noContent().build();
     }
+
+    // StaffController.java
+@PostMapping("/{staffId}/assign-service/{serviceId}")
+@PreAuthorize("hasRole('BUSINESS_OWNER')")
+public ResponseEntity<Void> assignServiceToStaff(
+        @PathVariable UUID staffId,
+        @PathVariable UUID serviceId) {
+    serviceService.assignStaffToService(staffId, serviceId);
+    return ResponseEntity.ok().build();
+}
 }

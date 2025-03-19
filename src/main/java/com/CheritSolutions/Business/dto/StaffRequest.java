@@ -1,10 +1,9 @@
 package com.CheritSolutions.Business.dto;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import java.util.UUID;
+
 
 import com.fasterxml.jackson.databind.JsonNode;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,10 +16,7 @@ public class StaffRequest {
 
     @NotBlank(message = "Position is required")
     private String position;
-     
-   @JdbcTypeCode(SqlTypes.JSON) // Use Hibernate's native JSON support
-@Column(columnDefinition = "jsonb")
     private JsonNode schedule;
 
-    // Getters and setters
+    private UUID serviceId;
 }

@@ -13,5 +13,7 @@ public class BusinessRequest {
     @NotBlank(message = "Address is required")
     private String address;
 
+    private String email;
+
     // Getters and setters
 }

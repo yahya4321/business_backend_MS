@@ -31,6 +31,8 @@ public class BusinessService {
          // Extract the ownerId from the JWT and set it in the entity
          String ownerId = jwt.getSubject(); // Get the "sub" claim from the token
          business.setOwnerId(ownerId);
+         String email = jwt.getClaim("email");
+        business.setEmail(email);
         Business savedBusiness = businessRepository.save(business);
         return modelMapper.map(savedBusiness, BusinessResponse.class);
     }
@@ -78,5 +80,14 @@ public class BusinessService {
                 return business.getOwnerId().equals(ownerId);
             })
             .orElseThrow(() -> new ResourceNotFoundException("Business not found"));
+    }
+
+
+    public List<BusinessResponse> searchBusinesses(String query) {
+        List<Business> businesses = businessRepository.findByNameContainingIgnoreCaseOrAddressContainingIgnoreCase(
+            query, query);
+        return businesses.stream()
+            .map(business -> modelMapper.map(business, BusinessResponse.class))
+            .collect(Collectors.toList());
     }
 }

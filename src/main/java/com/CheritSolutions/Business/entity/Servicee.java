@@ -43,6 +43,9 @@ public class Servicee {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private Integer duration; // Duration in minutes (e.g., 60)
+    
     @Column(name = "base_price", nullable = false, precision = 10, scale = 2) // Decimal precision
     private BigDecimal basePrice;
 

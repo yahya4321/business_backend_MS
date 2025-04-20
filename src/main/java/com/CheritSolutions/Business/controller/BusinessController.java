@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.CheritSolutions.Business.dto.BusinessRequest;
@@ -38,7 +39,7 @@ public class BusinessController {
 
     // Get a business by ID
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('BUSINESS_OWNER') and @businessService.isBusinessOwner(#id, authentication.name)")
+    //@PreAuthorize("hasRole('BUSINESS_OWNER') and @businessService.isBusinessOwner(#id, authentication.name)")
     public ResponseEntity<BusinessResponse> getBusiness(@PathVariable UUID id ) {
         BusinessResponse response = businessService.getBusiness(id);
         return ResponseEntity.ok(response);
@@ -46,7 +47,7 @@ public class BusinessController {
 
     // Get all businesses
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')") 
+   // @PreAuthorize("hasRole('ADMIN')") 
 
     public ResponseEntity<List<BusinessResponse>> getAllBusinesses() {
         List<BusinessResponse> responses = businessService.getAllBusinesses();
@@ -68,4 +69,13 @@ public class BusinessController {
         businessService.deleteBusiness(id);
         return ResponseEntity.noContent().build();
     }
+
+
+
+    @GetMapping("/search")
+public ResponseEntity<List<BusinessResponse>> searchBusinesses(
+    @RequestParam("q") String query) {
+    List<BusinessResponse> results = businessService.searchBusinesses(query);
+    return ResponseEntity.ok(results);
+}
 }

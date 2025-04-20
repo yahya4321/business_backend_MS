@@ -1,4 +1,5 @@
 package com.CheritSolutions.Business.service;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -49,21 +50,51 @@ public class ServiceService {
 
 
     // Get a service by ID
-    @Transactional(readOnly = true)
-    public ServiceResponse getService(UUID id) {
-        Servicee service = serviceRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
-        return modelMapper.map(service, ServiceResponse.class);
+    // ServiceService.java
+@Transactional(readOnly = true)
+public ServiceResponse getService(UUID id) {
+    Servicee service = serviceRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
+
+    ServiceResponse response = modelMapper.map(service, ServiceResponse.class);
+
+    // Manually map staff IDs
+    if (service.getStaff() != null && !service.getStaff().isEmpty()) {
+        response.setStaffIds(
+            service.getStaff().stream()
+                .map(staff -> staff.getId())
+                .collect(Collectors.toList())
+        );
+    } else {
+        response.setStaffIds(new ArrayList<>()); // Avoid null values
     }
 
-    // Get all services for a business
-    @Transactional(readOnly = true)
-    public List<ServiceResponse> getAllServicesByBusiness(UUID businessId) {
-        List<Servicee> services = serviceRepository.findByBusinessId(businessId);
-        return services.stream()
-                .map(service -> modelMapper.map(service, ServiceResponse.class))
-                .collect(Collectors.toList());
-    }
+    return response;
+}
+
+@Transactional(readOnly = true)
+public List<ServiceResponse> getAllServicesByBusiness(UUID businessId) {
+    List<Servicee> services = serviceRepository.findByBusinessId(businessId);
+
+    return services.stream()
+            .map(service -> {
+                ServiceResponse response = modelMapper.map(service, ServiceResponse.class);
+
+                // Manually map staff IDs
+                if (service.getStaff() != null && !service.getStaff().isEmpty()) {
+                    response.setStaffIds(
+                        service.getStaff().stream()
+                            .map(staff -> staff.getId())
+                            .collect(Collectors.toList())
+                    );
+                } else {
+                    response.setStaffIds(new ArrayList<>());
+                }
+
+                return response;
+            })
+            .collect(Collectors.toList());
+}
 
     // Update a service
     @Transactional
@@ -102,10 +133,72 @@ public Staff assignStaffToService(UUID staffId, UUID serviceId) {
         throw new IllegalArgumentException("Service does not belong to the staff's business");
     }
 
-    // Unassign from previous service and assign to new
-    staff.setService(null);
+    if (staff.getService() != null) {
+        staff.getService().getStaff().remove(staff); // Remove from old service's list
+    }
+
+    // Assign to new service
     staff.setService(service);
+    service.getStaff().add(staff); // Add to new service's list
+
     return staffRepository.save(staff);
+}
+
+
+public List<ServiceResponse> searchServicesInBusiness(
+    UUID businessId, String nameQuery, BigDecimal minPrice, BigDecimal maxPrice) {
+    
+    List<Servicee> services = serviceRepository.findByBusinessIdWithFilters(
+        businessId, nameQuery, minPrice != null ? minPrice : BigDecimal.ZERO, 
+        maxPrice != null ? maxPrice : BigDecimal.valueOf(Double.MAX_VALUE));
+    
+        return services.stream()
+        .map(service -> {
+            ServiceResponse response = modelMapper.map(service, ServiceResponse.class);
+
+            // Manually map staff IDs
+            if (service.getStaff() != null && !service.getStaff().isEmpty()) {
+                response.setStaffIds(
+                    service.getStaff().stream()
+                        .map(staff -> staff.getId())
+                        .collect(Collectors.toList())
+                );
+            } else {
+                response.setStaffIds(new ArrayList<>());
+            }
+
+            return response;
+        })
+        .collect(Collectors.toList());
+}
+
+
+public List<ServiceResponse> searchAllServices(
+    String nameQuery, BigDecimal minPrice, BigDecimal maxPrice) {
+    
+    List<Servicee> services = serviceRepository.findAllWithFilters  (
+        nameQuery, 
+        minPrice != null ? minPrice : BigDecimal.ZERO, 
+        maxPrice != null ? maxPrice : BigDecimal.valueOf(Double.MAX_VALUE));
+    
+        return services.stream()
+        .map(service -> {
+            ServiceResponse response = modelMapper.map(service, ServiceResponse.class);
+
+            // Manually map staff IDs
+            if (service.getStaff() != null && !service.getStaff().isEmpty()) {
+                response.setStaffIds(
+                    service.getStaff().stream()
+                        .map(staff -> staff.getId())
+                        .collect(Collectors.toList())
+                );
+            } else {
+                response.setStaffIds(new ArrayList<>());
+            }
+
+            return response;
+        })
+        .collect(Collectors.toList());
 }
     
 }

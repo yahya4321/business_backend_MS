@@ -38,6 +38,9 @@ public class Business {
     @Column(name = "owner_id")
     private String ownerId;
 
+    @Column(name = "email")
+    private String email;
+
     @OneToMany(mappedBy = "business", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore // Avoid circular references in JSON responses
     private List<Servicee> services = new ArrayList<>();

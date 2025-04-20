@@ -1,15 +1,25 @@
 package com.CheritSolutions.Business.controller;
 
+import com.CheritSolutions.Business.dto.AvailableSlotDTO;
 import com.CheritSolutions.Business.dto.StaffRequest;
 import com.CheritSolutions.Business.dto.StaffResponse;
+import com.CheritSolutions.Business.entity.AvailabilitySlot;
+import com.CheritSolutions.Business.entity.SlotStatus;
+import com.CheritSolutions.Business.entity.Staff;
+import com.CheritSolutions.Business.exception.ResourceNotFoundException;
+import com.CheritSolutions.Business.repository.AvailabilitySlotRepository;
+import com.CheritSolutions.Business.repository.StaffRepository;
 import com.CheritSolutions.Business.service.ServiceService;
 import com.CheritSolutions.Business.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +29,12 @@ public class StaffController {
 
     @Autowired
     private StaffService staffService;
+    @Autowired
+    private StaffRepository staffRepository;
+
+    @Autowired
+    private AvailabilitySlotRepository availabilitySlotRepository;
+    
      @Autowired
     private ServiceService serviceService;
 
@@ -34,7 +50,7 @@ public class StaffController {
 
     // Get a staff member by ID
     @GetMapping("/{staffId}")
-    @PreAuthorize("@staffService.isStaffOwner(#staffId, authentication.name)")
+   // @PreAuthorize("@staffService.isStaffOwner(#staffId, authentication.name)")
     public ResponseEntity<StaffResponse> getStaff(@PathVariable UUID staffId) {
         StaffResponse response = staffService.getStaff(staffId);
         return ResponseEntity.ok(response);
@@ -42,7 +58,7 @@ public class StaffController {
 
     // Get all staff members for a business
     @GetMapping
-    @PreAuthorize("hasRole('BUSINESS_OWNER')") 
+  //  @PreAuthorize("hasRole('BUSINESS_OWNER')") 
 
     public ResponseEntity<List<StaffResponse>> getAllStaffByBusiness(@PathVariable UUID businessId) {
         List<StaffResponse> responses = staffService.getAllStaffByBusiness(businessId);
@@ -67,7 +83,7 @@ public class StaffController {
         return ResponseEntity.noContent().build();
     }
 
-    // StaffController.java
+    
 @PostMapping("/{staffId}/assign-service/{serviceId}")
 @PreAuthorize("hasRole('BUSINESS_OWNER')")
 public ResponseEntity<Void> assignServiceToStaff(
@@ -76,4 +92,74 @@ public ResponseEntity<Void> assignServiceToStaff(
     serviceService.assignStaffToService(staffId, serviceId);
     return ResponseEntity.ok().build();
 }
+
+
+// Business Service: StaffController.java
+@GetMapping("/{staffId}/availability")
+public boolean checkAvailability(
+    @PathVariable UUID businessId,
+    @PathVariable UUID staffId,
+    @RequestParam Instant slotStart,
+    @RequestParam Integer duration // Add duration parameter
+) {
+    return staffService.isStaffAvailable(businessId, staffId, slotStart, duration);
+}
+
+@PostMapping("/{staffId}/reserve")
+public ResponseEntity<UUID> reserveSlots(
+    @PathVariable UUID staffId,
+    @RequestParam Instant start,
+    @RequestParam int duration) {
+    UUID slotId = staffService.reserveSlots(staffId, start, duration); // Adjust service to return slotId
+    return ResponseEntity.ok(slotId);
+}
+
+
+
+@GetMapping("/{staffId}/reservations")
+public ResponseEntity<List<AvailabilitySlot>> getReservations(@PathVariable UUID staffId) {
+    List<AvailabilitySlot> slots = availabilitySlotRepository
+        .findByStaffIdAndStatusIn(staffId, List.of(SlotStatus.BOOKED, SlotStatus.REST));
+    return ResponseEntity.ok(slots);
+}
+
+
+@PutMapping("/{staffId}/reservations/{slotId}")
+public ResponseEntity<Void> updateReservation(
+    @PathVariable UUID staffId, 
+    @PathVariable UUID slotId,
+    @RequestParam Instant newStart,
+    @RequestParam int newDuration
+) {
+    staffService.updateReservation(staffId, slotId, newStart, newDuration);
+    return ResponseEntity.ok().build();
+}
+
+@DeleteMapping("/{staffId}/reservations/{slotId}")
+public ResponseEntity<Void> cancelReservation(@PathVariable UUID staffId,
+                                              @PathVariable UUID slotId) {
+    staffService.cancelReservation(staffId, slotId);
+    return ResponseEntity.noContent().build();
+}
+
+
+
+
+
+
+
+
+@GetMapping("/{staffId}/available-slots")
+public List<AvailableSlotDTO> getAvailableSlots(
+    @PathVariable UUID staffId,
+    @RequestParam int duration) {
+    
+    Staff staff = staffRepository.findById(staffId)
+        .orElseThrow(() -> new ResourceNotFoundException("Staff not found"));
+    
+    return staffService.generateAvailableSlots(staff, duration);
+}
+
+
+
 }

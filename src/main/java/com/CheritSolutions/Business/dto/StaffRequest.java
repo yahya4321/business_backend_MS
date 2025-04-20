@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,4 +20,7 @@ public class StaffRequest {
     private JsonNode schedule;
 
     private UUID serviceId;
+    
+    @NotNull
+    private Integer postBufferTime;
 }

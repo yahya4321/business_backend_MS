@@ -1,5 +1,6 @@
 package com.CheritSolutions.Business.entity;
 
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -12,9 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,15 +27,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Setter
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 public class Staff {
     @Id
@@ -50,6 +40,8 @@ public class Staff {
 
     @Column(nullable = false)
     private String name;
+
+  
 
     @Column(nullable = false)
     private String position;
@@ -66,10 +58,96 @@ public class Staff {
     private List<AvailabilitySlot> availabilitySlots = new ArrayList<>();
 
 
+
+    @Column(name = "average_rating", precision = 3, scale = 1)
+    private BigDecimal averageRating = BigDecimal.ZERO;
+
+    @Column(name = "rating_count", nullable = false)
+    private Integer ratingCount = 0;
+
+
+
     @ManyToOne(fetch = FetchType.LAZY)
 @JoinColumn(name = "service_id", nullable = true) // Can be null if staff is not assigned
 private Servicee service;
+public UUID getId() {
+    return this.id;
+}
 
+public void setId(UUID id) {
+    this.id = id;
+}
+
+public Business getBusiness() {
+    return this.business;
+}
+
+public void setBusiness(Business business) {
+    this.business = business;
+}
+
+public String getName() {
+    return this.name;
+}
+
+public void setName(String name) {
+    this.name = name;
+}
+
+public String getPosition() {
+    return this.position;
+}
+
+public void setPosition(String position) {
+    this.position = position;
+}
+
+public JsonNode getSchedule() {
+    return this.schedule;
+}
+
+public void setSchedule(JsonNode schedule) {
+    this.schedule = schedule;
+}
+
+public Integer getPostBufferTime() {
+    return this.postBufferTime;
+}
+
+public void setPostBufferTime(Integer postBufferTime) {
+    this.postBufferTime = postBufferTime;
+}
+
+public List<AvailabilitySlot> getAvailabilitySlots() {
+    return this.availabilitySlots;
+}
+
+public void setAvailabilitySlots(List<AvailabilitySlot> availabilitySlots) {
+    this.availabilitySlots = availabilitySlots;
+}
+
+public Servicee getService() {
+    return this.service;
+}
+
+public void setService(Servicee service) {
+    this.service = service;
+}
+public BigDecimal getAverageRating() {
+    return this.averageRating;
+}
+
+public void setAverageRating(BigDecimal averageRating) {
+    this.averageRating = averageRating;
+}
+
+public Integer getRatingCount() {
+    return this.ratingCount;
+}
+
+public void setRatingCount(Integer ratingCount) {
+    this.ratingCount = ratingCount;
+}
 
 // Add helper method to calculate buffer end time
 public Instant getBufferEndTime(Instant startTime, int duration) {

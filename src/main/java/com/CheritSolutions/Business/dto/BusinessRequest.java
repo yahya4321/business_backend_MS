@@ -1,11 +1,7 @@
 package com.CheritSolutions.Business.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter // Add this
-@Setter // Add this
 public class BusinessRequest {
     @NotBlank(message = "Name is required")
     private String name;
@@ -15,5 +11,27 @@ public class BusinessRequest {
 
     private String email;
 
-    // Getters and setters
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

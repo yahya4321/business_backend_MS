@@ -34,12 +34,7 @@ import com.CheritSolutions.Business.repository.BusinessRepository;
 import com.CheritSolutions.Business.repository.StaffRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
-
-@AllArgsConstructor
-@NoArgsConstructor
 @Service
 public class StaffService {
 

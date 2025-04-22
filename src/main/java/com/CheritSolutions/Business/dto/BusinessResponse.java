@@ -1,18 +1,42 @@
 package com.CheritSolutions.Business.dto;
 
-import java.util.List;
 import java.util.UUID;
 
-import lombok.Getter;
-import lombok.Setter;
-@Getter // Ensure this is present
-@Setter
 public class BusinessResponse {
     private UUID id;
     private String name;
     private String address;
     private String email;
 
-  //  private List<ServiceResponse> services; // Nested DTO
-   // private List<StaffResponse> staff; // Simplified staff data
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }
